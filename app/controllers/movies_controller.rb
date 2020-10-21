@@ -7,7 +7,6 @@ class MoviesController < ApplicationController
   end
 
   def index
-    byebug
     @all_ratings = Movie.@all_ratings
     @ratings_to_show = params[:ratings].keys || @all_ratings
     @movies = Movie.with_ratings(@ratings_to_show)
