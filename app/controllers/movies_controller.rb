@@ -1,5 +1,18 @@
 class MoviesController < ApplicationController
-
+  
+  def set_order(order_val)
+     if order_val == "movie_title" 
+        @title_class = "bg-warning hilite"
+        @release_class = ""
+        @movies.order!(:title)
+    elsif order_val == "release_date"
+        @release_class = "bg-warning hilite"
+        @title_class = ""
+        @movies.order!(:release_date)
+    end
+  end
+    
+  
   def show
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
@@ -7,25 +20,33 @@ class MoviesController < ApplicationController
   end
 
   def index
+    #byebug
     @all_ratings = Movie.all_ratings
     @ratings_to_show = []
+   
+    if params[:commit] == "Refresh"
+      session.delete(:ratings)
+    end
+    
     if params[:ratings] != nil 
       @ratings_to_show =  params[:ratings].keys
+      @movies = Movie.with_ratings(@ratings_to_show)
+      session[:ratings] = params[:ratings]
+    elsif session.key?(:ratings)
+      @ratings_to_show =  session[:ratings].keys
       @movies = Movie.with_ratings(@ratings_to_show)
     else
       @movies = Movie.all
     end
  
     
-    if params[:order_val] == "movie_title"
-        @title_class = "bg-warning hilite"
-        @release_class = ""
-        @movies.order!(:title)
-    elsif params[:order_val] == "release_date"
-        @release_class = "bg-warning hilite"
-        @title_class = ""
-        @movies.order!(:release_date)
+    if params.key?(:order_val)
+      set_order(params[:order_val])
+      session[:order_val] = params[:order_val]
+    elsif session.key?(:order_val)
+        set_order(session[:order_val])
     end
+    
   end
 
   def new
