@@ -15,10 +15,17 @@ class MoviesController < ApplicationController
     else
       @movies = Movie.all
     end
+ 
     
-    
-    
-    
+    if params[:order_val] == "movie_title"
+        @title_class = "bg-warning hilite"
+        @release_class = ""
+        @movies.order!(:title)
+    elsif params[:order_val] == "release_date"
+        @release_class = "bg-warning hilite"
+        @title_class = ""
+        @movies.order!(:release_date)
+    end
   end
 
   def new
